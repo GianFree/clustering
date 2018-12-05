@@ -116,6 +116,19 @@ proc clustering::cluster {} {
   $w.menubar.import.menu add command -label "Charmm..." -command "[namespace current]::import charmm"
   $w.menubar.import.menu add command -label "Raw (index list)..." -command "[namespace current]::import raw"
 
+  # Export menu
+  menubutton $w.menubar.export -text "Export" -underline 0 -menu $w.menubar.export.menu
+  pack $w.menubar.export -side left
+  menu $w.menubar.export.menu -tearoff no
+  $w.menubar.export.menu add command -label "Dummy_export"              
+  #-command "[namespace current]::import nmrcluster"
+  #
+  #$w.menubar.import.menu add command -label "Xcluster..."            -command "[namespace current]::import xcluster"
+  #$w.menubar.import.menu add command -label "Cutree (R)..."          -command "[namespace current]::import cutree"
+  #$w.menubar.import.menu add command -label "Gromacs (g_cluster)..." -command "[namespace current]::import gcluster"
+  #$w.menubar.import.menu add command -label "Charmm..." -command "[namespace current]::import charmm"
+  #$w.menubar.import.menu add command -label "Raw (index list)..." -command "[namespace current]::import raw"
+
   # Menubar / Help menu
   menubutton $w.menubar.help -text "Help" -menu $w.menubar.help.menu
   pack $w.menubar.help -side right
