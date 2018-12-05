@@ -120,8 +120,7 @@ proc clustering::cluster {} {
   menubutton $w.menubar.export -text "Export" -underline 0 -menu $w.menubar.export.menu
   pack $w.menubar.export -side left
   menu $w.menubar.export.menu -tearoff no
-  $w.menubar.export.menu add command -label "Dummy_export"              
-  #-command "[namespace current]::import nmrcluster"
+  $w.menubar.export.menu add command -label "Dummy_export"            -command "[namespace current]::export cluster"
   #
   #$w.menubar.import.menu add command -label "Xcluster..."            -command "[namespace current]::import xcluster"
   #$w.menubar.import.menu add command -label "Cutree (R)..."          -command "[namespace current]::import cutree"
@@ -959,6 +958,54 @@ proc clustering::import_raw {fileid} {
   $level_list selection set 0
   [namespace current]::UpdateLevels
 }
+
+#############################################################################
+# Export
+
+## TEST
+
+proc clustering::export {type} {
+  variable clust_file
+  variable cluster
+  variable level_list
+
+  set clust_file [tk_getSaveFile -title "Saving cluster file" -filetypes [list {"Cluster output" {.dat .csv}} {"All Files" *}] ]
+
+  set fileid [open $clust_file "w"]
+  puts $fileid "Simone sbolo"
+  # if {[array exists cluster]} {unset cluster}
+  # $level_list delete 0 end
+  # [namespace current]::import_$type $fileid
+  close $fileid
+}
+
+# NMRCLUSTER (http://neon.chem.le.ac.uk/nmrclust, not working)
+proc clustering::export_cluster {fileid} {
+  variable level_list
+  variable cluster
+
+  # Read data
+  set i 0
+  while {![eof $fileid]} {
+    gets $fileid line
+    if { [ regexp {^Members:([ 0-9]+)} $line dummy data ] } {
+      incr i 1
+      set cluster(0:$i) [[namespace current]::decrease_list $data]
+    } elseif { [ regexp {^Outliers:([ 0-9]+)} $line dummy data ] } {
+      foreach d $data {
+        incr i 1
+        set cluster(0:$i) [expr {$d - 1}]
+      }
+    }
+  }
+
+  $level_list insert end 0
+  $level_list selection set 0
+
+  [namespace current]::UpdateLevels
+}
+
+## END TEST
 
 #############################################################################
 # Calculate
