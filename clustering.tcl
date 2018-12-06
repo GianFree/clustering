@@ -117,16 +117,11 @@ proc clustering::cluster {} {
   $w.menubar.import.menu add command -label "Raw (index list)..." -command "[namespace current]::import raw"
 
   # Export menu
+  # by Gianfranco Abrusci
   menubutton $w.menubar.export -text "Export" -underline 0 -menu $w.menubar.export.menu
   pack $w.menubar.export -side left
   menu $w.menubar.export.menu -tearoff no
   $w.menubar.export.menu add command -label "Saving data..."            -command "[namespace current]::export" 
-  #
-###  # TEST
-###  menubutton $w.menubar.test -text "test" -underline 0 -menu $w.menubar.test.menu
-###  pack $w.menubar.test -side left
-###  menu $w.menubar.test.menu -tearoff no
-###  $w.menubar.test.menu add command -label "Dummy_test"            -command "[namespace current]::test"
 
   # Menubar / Help menu
   menubutton $w.menubar.help -text "Help" -menu $w.menubar.help.menu
@@ -962,25 +957,6 @@ proc clustering::import_raw {fileid} {
 #############################################################################
 # Export
 
-###proc clustering::test {type} {
-###  variable clust_file
-###  variable cluster
-###  variable level_list
-###
-###  set clust_file [tk_getSaveFile -title "Saving cluster file" -filetypes [list {"Cluster output" {.dat .csv}} {"All Files" *}] ]
-###
-###  set fileid [open $clust_file "w"]
-###  puts $fileid "Simone sbolo"
-###  if {[info exists result]} {
-###      tk_messageBox -title "Testing error" -parent $parent -message "Meh ehi"
-###      puts "Ciaone"
-###    }
-###  # $level_list delete 0 end
-###  # [namespace current]::import_$type $fileid
-###  close $fileid
-###}
-## TEST
-
 proc clustering::export { } {
   variable clust_file
 
@@ -989,43 +965,13 @@ proc clustering::export { } {
   set clust_file [tk_getSaveFile -title "Saving cluster file" -filetypes [list {"Cluster output" {.dat .csv}} {"All Files" *}] ]
 
   if {[info exists my_data]} {
-      tk_messageBox -title "Testing error" -message "Meh ehi"
-      puts "Ciaone"
+      tk_messageBox -title "Yeah!" -message "Results saved!" -detail "Meh ehi! ;)"
       set fileid [open $clust_file "w"]
       puts $fileid "$my_data"
       close $fileid
     }
-  # $level_list delete 0 end
-  # [namespace current]::import_$type $fileid
 }
 
-#### they define an operation for each type of files available.
-###proc clustering::export_cluster {fileid} {
-###  variable level_list
-###  variable cluster
-###
-###  # Read data
-###  set i 0
-###  while {![eof $fileid]} {
-###    gets $fileid line
-###    if { [ regexp {^Members:([ 0-9]+)} $line dummy data ] } {
-###      incr i 1
-###      set cluster(0:$i) [[namespace current]::decrease_list $data]
-###    } elseif { [ regexp {^Outliers:([ 0-9]+)} $line dummy data ] } {
-###      foreach d $data {
-###        incr i 1
-###        set cluster(0:$i) [expr {$d - 1}]
-###      }
-###    }
-###  }
-###
-###  $level_list insert end 0
-###  $level_list selection set 0
-###
-###  [namespace current]::UpdateLevels
-###}
-###
-## END TEST
 
 #############################################################################
 # Calculate
@@ -1086,6 +1032,4 @@ proc clustering::calculate {} {
 
     [namespace current]::UpdateLevels
   }
-
-  return $result
 }

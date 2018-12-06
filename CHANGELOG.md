@@ -1,3 +1,7 @@
+### 2.0.2 (2018-12-06)
+
+* Add export button
+
 ### 2.0.1 (2014-06-05)
 
 * Move code to github
