@@ -120,13 +120,13 @@ proc clustering::cluster {} {
   menubutton $w.menubar.export -text "Export" -underline 0 -menu $w.menubar.export.menu
   pack $w.menubar.export -side left
   menu $w.menubar.export.menu -tearoff no
-  $w.menubar.export.menu add command -label "Dummy_export"            -command "[namespace current]::export cluster"
+  $w.menubar.export.menu add command -label "Saving data..."            -command "[namespace current]::export" 
   #
-  #$w.menubar.import.menu add command -label "Xcluster..."            -command "[namespace current]::import xcluster"
-  #$w.menubar.import.menu add command -label "Cutree (R)..."          -command "[namespace current]::import cutree"
-  #$w.menubar.import.menu add command -label "Gromacs (g_cluster)..." -command "[namespace current]::import gcluster"
-  #$w.menubar.import.menu add command -label "Charmm..." -command "[namespace current]::import charmm"
-  #$w.menubar.import.menu add command -label "Raw (index list)..." -command "[namespace current]::import raw"
+###  # TEST
+###  menubutton $w.menubar.test -text "test" -underline 0 -menu $w.menubar.test.menu
+###  pack $w.menubar.test -side left
+###  menu $w.menubar.test.menu -tearoff no
+###  $w.menubar.test.menu add command -label "Dummy_test"            -command "[namespace current]::test"
 
   # Menubar / Help menu
   menubutton $w.menubar.help -text "Help" -menu $w.menubar.help.menu
@@ -962,49 +962,69 @@ proc clustering::import_raw {fileid} {
 #############################################################################
 # Export
 
+###proc clustering::test {type} {
+###  variable clust_file
+###  variable cluster
+###  variable level_list
+###
+###  set clust_file [tk_getSaveFile -title "Saving cluster file" -filetypes [list {"Cluster output" {.dat .csv}} {"All Files" *}] ]
+###
+###  set fileid [open $clust_file "w"]
+###  puts $fileid "Simone sbolo"
+###  if {[info exists result]} {
+###      tk_messageBox -title "Testing error" -parent $parent -message "Meh ehi"
+###      puts "Ciaone"
+###    }
+###  # $level_list delete 0 end
+###  # [namespace current]::import_$type $fileid
+###  close $fileid
+###}
 ## TEST
 
-proc clustering::export {type} {
+proc clustering::export { } {
   variable clust_file
-  variable cluster
-  variable level_list
+
+  set my_data ${::clustering::result}
 
   set clust_file [tk_getSaveFile -title "Saving cluster file" -filetypes [list {"Cluster output" {.dat .csv}} {"All Files" *}] ]
 
-  set fileid [open $clust_file "w"]
-  puts $fileid "Simone sbolo"
-  # if {[array exists cluster]} {unset cluster}
+  if {[info exists my_data]} {
+      tk_messageBox -title "Testing error" -message "Meh ehi"
+      puts "Ciaone"
+      set fileid [open $clust_file "w"]
+      puts $fileid "$my_data"
+      close $fileid
+    }
   # $level_list delete 0 end
   # [namespace current]::import_$type $fileid
-  close $fileid
 }
 
-# NMRCLUSTER (http://neon.chem.le.ac.uk/nmrclust, not working)
-proc clustering::export_cluster {fileid} {
-  variable level_list
-  variable cluster
-
-  # Read data
-  set i 0
-  while {![eof $fileid]} {
-    gets $fileid line
-    if { [ regexp {^Members:([ 0-9]+)} $line dummy data ] } {
-      incr i 1
-      set cluster(0:$i) [[namespace current]::decrease_list $data]
-    } elseif { [ regexp {^Outliers:([ 0-9]+)} $line dummy data ] } {
-      foreach d $data {
-        incr i 1
-        set cluster(0:$i) [expr {$d - 1}]
-      }
-    }
-  }
-
-  $level_list insert end 0
-  $level_list selection set 0
-
-  [namespace current]::UpdateLevels
-}
-
+#### they define an operation for each type of files available.
+###proc clustering::export_cluster {fileid} {
+###  variable level_list
+###  variable cluster
+###
+###  # Read data
+###  set i 0
+###  while {![eof $fileid]} {
+###    gets $fileid line
+###    if { [ regexp {^Members:([ 0-9]+)} $line dummy data ] } {
+###      incr i 1
+###      set cluster(0:$i) [[namespace current]::decrease_list $data]
+###    } elseif { [ regexp {^Outliers:([ 0-9]+)} $line dummy data ] } {
+###      foreach d $data {
+###        incr i 1
+###        set cluster(0:$i) [expr {$d - 1}]
+###      }
+###    }
+###  }
+###
+###  $level_list insert end 0
+###  $level_list selection set 0
+###
+###  [namespace current]::UpdateLevels
+###}
+###
 ## END TEST
 
 #############################################################################
@@ -1023,6 +1043,10 @@ proc clustering::calculate {} {
   variable calc_selupdate
   variable calc_weight
 
+  variable result
+
+
+  #
   # Get selection
   set seltext [[namespace current]::set_sel]
   if {$seltext == ""} {
@@ -1035,7 +1059,7 @@ proc clustering::calculate {} {
   set result [measure cluster $sel num $calc_num cutoff $calc_cutoff \
                 first $calc_first last $calc_last step $calc_step \
                 distfunc $calc_distfunc selupdate $calc_selupdate weight $calc_weight]
-
+                
   set nclusters [llength $result]
 
   if {$nclusters > 0} {
@@ -1062,4 +1086,6 @@ proc clustering::calculate {} {
 
     [namespace current]::UpdateLevels
   }
+
+  return $result
 }
